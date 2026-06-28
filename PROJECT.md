@@ -19,18 +19,31 @@ CivicPulse AI is a state-of-the-art, full-stack civic engagement and municipal a
 
 ## 🔍 Problem Statement Selected
 
-### The Civic Disconnection & Operational Bottleneck
-Municipal governance and city operations in modern urban environments face a double-sided bottleneck:
+### Community Hero - Hyperlocal Problem Solver
+**Background**
 
-1. **For Citizens (The Black Box of Complaint Reporting)**:
-   * **Lack of Transparency**: Citizens report issues (potholes, open manholes, leaking sewage lines) into manual, non-transparent portals, where they disappear without visible progress updates.
-   * **Zero Engagement or Incentives**: There is no incentive or positive reinforcement for citizens to perform civic duties, verify neighbor complaints, or assist in neighborhood upkeep.
-   * **Language Barriers**: Standard civic portals are monolingual and exclude non-English speakers from participating in localized decision-making.
+Communities frequently face issues such as potholes, water leakages, damaged streetlights, waste management concerns, and public infrastructure challenges. Reporting these issues is often fragmented, difficult to track, and lacks transparency.
 
-2. **For Municipal Authorities (Manual & Fragmented Operations)**:
-   * **Inefficient Manual Triage**: Officers manually sort through thousands of incoming duplicate, spam, or poorly photographed reports, creating extreme operational lag.
-   * **Lack of Prioritization Metric**: Crucial or hazardous issues (e.g., hanging electrical cables or chemical leaks) are mixed in with minor aesthetic issues, resulting in delayed emergency responses.
-   * **Siloed Dispatching**: There is no direct, automated pipeline from an incoming visual complaint to the correct department dispatch line with estimated SLA repair costs and public risk assessments.
+**Challenge**
+
+Build a platform that enables citizens to identify, report, validate, track, and resolve community issues through collaboration, data, and intelligent automation.
+The solution should encourage transparency, accountability, and community participation.
+
+**Example Features:**
+
+* Image and video-based issue reporting
+* AI-powered issue categorization
+* Geo-location and mapping
+* Community verification
+* Real-time issue tracking
+* Impact dashboards
+* Predictive insights
+* Gamification for citizen engagement
+
+**Evaluation Focus**
+
+The solution should demonstrate how AI can help communities address local challenges more efficiently through improved reporting, verification, tracking, and resolution of issues.
+
 
 ---
 
