@@ -1,0 +1,157 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A registered citizen or municipal officer profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth unique ID" },
+        "email": { "type": "string", "description": "Email address" },
+        "name": { "type": "string", "description": "Full name" },
+        "role": { "type": "string", "enum": ["citizen", "official"], "description": "Role in the portal" },
+        "city": { "type": "string", "description": "City of residence/work" },
+        "points": { "type": "number", "description": "Points earned from civic duty" },
+        "badge": { "type": "string", "description": "Rank title based on points" },
+        "avatarUrl": { "type": "string", "description": "URL to profile avatar" },
+        "joinedAt": { "type": "string", "format": "date-time", "description": "Date joined" }
+      },
+      "required": ["uid", "email", "name", "role", "city"]
+    },
+    "Department": {
+      "title": "Department",
+      "description": "A municipal department responsible for resolving specific issue types",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier" },
+        "name": { "type": "string", "description": "Department name" },
+        "code": { "type": "string", "description": "Abbreviation code" },
+        "headName": { "type": "string", "description": "Department head name" },
+        "officerCount": { "type": "number" },
+        "resolvedCount": { "type": "number" },
+        "activeCount": { "type": "number" },
+        "icon": { "type": "string" }
+      },
+      "required": ["id", "name", "code"]
+    },
+    "Reward": {
+      "title": "Reward",
+      "description": "An eco or civic reward that citizens can redeem with their points",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "costPoints": { "type": "number" },
+        "partnerName": { "type": "string" },
+        "category": { "type": "string" },
+        "couponCode": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["id", "title", "costPoints"]
+    },
+    "Complaint": {
+      "title": "Complaint",
+      "description": "A civic issue reported by a citizen",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "city": { "type": "string" },
+        "address": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "images": { "type": "array" },
+        "videos": { "type": "array" },
+        "reporterId": { "type": "string" },
+        "reporterName": { "type": "string" },
+        "assignedOfficerId": { "type": "string" },
+        "assignedOfficerName": { "type": "string" },
+        "department": { "type": "string" },
+        "status": { "type": "string" },
+        "priority": { "type": "string" },
+        "severity": { "type": "string" },
+        "verificationCount": { "type": "number" },
+        "upvoters": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "title", "reporterId", "status", "department"]
+    },
+    "UserReward": {
+      "title": "UserReward",
+      "description": "A reward that has been redeemed by a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "rewardId": { "type": "string" },
+        "title": { "type": "string" },
+        "costPoints": { "type": "number" },
+        "couponCode": { "type": "string" },
+        "redeemedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "rewardId"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A notification alert for a citizen",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "A comment on a reported complaint",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "complaintId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userRole": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "complaintId", "userId", "text"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/departments/{departmentId}": {
+      "schema": { "$ref": "#/entities/Department" },
+      "description": "Municipal departments reference"
+    },
+    "/rewards/{rewardId}": {
+      "schema": { "$ref": "#/entities/Reward" },
+      "description": "Redeemable eco/civic rewards reference"
+    },
+    "/complaints/{complaintId}": {
+      "schema": { "$ref": "#/entities/Complaint" },
+      "description": "Reported civic complaints"
+    },
+    "/user_rewards/{userRewardId}": {
+      "schema": { "$ref": "#/entities/UserReward" },
+      "description": "Log of redeemed rewards"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "User notification feed"
+    },
+    "/comments/{commentId}": {
+      "schema": { "$ref": "#/entities/Comment" },
+      "description": "Complaint discussion feed comments"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "CivicPulse AI",
+  "description": "Empower citizens to report civic issues while enabling municipalities to intelligently prioritize, manage, and resolve them using AI.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

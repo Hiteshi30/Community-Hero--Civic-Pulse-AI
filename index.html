@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="CivicPulse AI - Intelligent Community Operations. Empower citizens and enable municipalities to intelligently prioritize and resolve civic issues using AI agents." />
+    
+    <!-- Open Graph Metadata -->
+    <meta property="og:title" content="CivicPulse AI" />
+    <meta property="og:description" content="AI-driven community operations center. Report, verify, and resolve local city issues seamlessly." />
+    <meta property="og:image" content="https://api.dicebear.com/7.x/bottts/png?seed=civicpulse&backgroundColor=4f46e5" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Theme & Manifest configurations -->
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/bottts/png?seed=civicpulse&backgroundColor=4f46e5" />
+    
+    <title>CivicPulse AI - Intelligent Community Operations</title>
+    
+    <!-- Embedded Initial Splash Style -->
+    <style>
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        background-color: #09090b;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        font-family: system-ui, -apple-system, sans-serif;
+        color: #f4f4f5;
+        transition: opacity 0.4s ease, visibility 0.4s;
+      }
+      .loader-spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #18181b;
+        border-top-color: #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 16px;
+      }
+      .loader-text {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #a1a1aa;
+        animation: pulse 1.5s ease-in-out infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- PWA Offline/Startup Splash Screen -->
+    <div id="initial-loader">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">Initializing CivicPulse Engine...</div>
+    </div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Handle Splash screen dismissal once React mounts -->
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const loader = document.getElementById('initial-loader');
+          if (loader) {
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+            setTimeout(() => loader.remove(), 400);
+          }
+        }, 600);
+      });
+    </script>
+  </body>
+</html>
+
