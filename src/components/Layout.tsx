@@ -53,6 +53,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Layout and Drawer States
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationFilter, setNotificationFilter] = useState<'all' | 'status' | 'ai' | 'emergency'>('all');
 
 
@@ -621,7 +622,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div className="relative">
                 <button 
                   id="notif-bell-desktop"
-                  onClick={() => setNotifDropdownOpen(!notifDropdownOpen)}
+                  onClick={() => {
+                    setNotifDropdownOpen(!notifDropdownOpen);
+                    setProfileDropdownOpen(false);
+                  }}
                   className="p-2.5 hover:bg-slate-100 dark:hover:bg-zinc-900 rounded-xl transition-all relative border border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300"
                 >
                   <Bell className="w-4.5 h-4.5" />
@@ -713,10 +717,109 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 )}
               </div>
 
-              {/* Quick Profile Summary */}
-              <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/60">
-                <span className="text-xs font-bold text-slate-750 dark:text-zinc-200">{user?.name}</span>
-                <img src={user?.avatarUrl} className="w-6 h-6 rounded-full border border-indigo-500/30 object-cover bg-slate-200" alt="Avatar" />
+              {/* Quick Profile Summary with Dropdown */}
+              <div className="relative">
+                <button 
+                  id="profile-menu-btn"
+                  onClick={() => {
+                    setProfileDropdownOpen(!profileDropdownOpen);
+                    setNotifDropdownOpen(false);
+                  }}
+                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-zinc-800 bg-white/60 dark:bg-zinc-900/60 hover:bg-slate-50 dark:hover:bg-zinc-800 transition-all cursor-pointer text-left"
+                >
+                  <span className="text-xs font-bold text-slate-750 dark:text-zinc-200">{user?.name}</span>
+                  <img src={user?.avatarUrl} className="w-6 h-6 rounded-full border border-indigo-500/30 object-cover bg-slate-200" alt="Avatar" />
+                </button>
+
+                {profileDropdownOpen && (
+                  <div 
+                    id="profile-dropdown-menu"
+                    className="absolute right-0 mt-3 w-64 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl shadow-2xl z-50 overflow-hidden text-left p-2 space-y-2"
+                  >
+                    <div className="px-3 py-2 border-b border-slate-100 dark:border-zinc-800">
+                      <p className="text-xs font-bold text-slate-800 dark:text-zinc-200">{user?.name}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-zinc-500 font-medium truncate">{user?.email || (user?.role === 'officer' ? `Officer ID: ${user.officerId}` : 'Citizen Account')}</p>
+                    </div>
+
+                    {/* Theme options inside the dropdown menu */}
+                    <div className="px-3 py-1 space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 dark:text-zinc-500">Theme</span>
+                        <span className="text-[10px] font-bold text-indigo-500 dark:text-indigo-400 capitalize">{theme}</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1 bg-slate-100 dark:bg-zinc-950 p-1 rounded-xl border border-slate-200/50 dark:border-zinc-850">
+                        <button
+                          type="button"
+                          title="Light Theme"
+                          onClick={() => {
+                            setTheme('light');
+                            showToast('Switched to Light theme', 'success');
+                          }}
+                          className={`p-1.5 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            theme === 'light'
+                              ? 'bg-white dark:bg-zinc-800 text-amber-500 shadow-xs border border-slate-200/30'
+                              : 'text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300'
+                          }`}
+                        >
+                          <Sun className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          title="Dark Theme"
+                          onClick={() => {
+                            setTheme('dark');
+                            showToast('Switched to Dark theme', 'success');
+                          }}
+                          className={`p-1.5 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            theme === 'dark'
+                              ? 'bg-white dark:bg-zinc-800 text-indigo-500 dark:text-indigo-400 shadow-xs border border-slate-200/30'
+                              : 'text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300'
+                          }`}
+                        >
+                          <Moon className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          title="System Theme"
+                          onClick={() => {
+                            setTheme('system');
+                            showToast('Theme synced with your system preferences', 'success');
+                          }}
+                          className={`p-1.5 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
+                            theme === 'system'
+                              ? 'bg-white dark:bg-zinc-800 text-teal-500 shadow-xs border border-slate-200/30'
+                              : 'text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300'
+                          }`}
+                        >
+                          <Laptop className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-slate-100 dark:border-zinc-800 pt-2">
+                      <Link
+                        to="/profile"
+                        onClick={() => setProfileDropdownOpen(false)}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-slate-750 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-lg transition-all"
+                      >
+                        <User className="w-4 h-4 text-indigo-500" />
+                        <span>Profile Settings</span>
+                      </Link>
+
+                      <button
+                        onClick={() => {
+                          setProfileDropdownOpen(false);
+                          handleSignOut();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/10 rounded-lg transition-all text-left cursor-pointer"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+
+                  </div>
+                )}
               </div>
 
             </div>
