@@ -10,10 +10,11 @@ import {
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Cell, PieChart, Pie } from 'recharts';
 import { CityHealthDashboard } from '../components/CityHealthDashboard';
 import { LiveActivityFeed } from '../components/LiveActivityFeed';
+import { IssueStatus } from '../types';
 
 
 export const CitizenDashboard: React.FC = () => {
-  const { user, complaints, notifications, t } = useApp();
+  const { user, complaints, notifications, showToast, t } = useApp();
   const navigate = useNavigate();
   const [activeChartTab, setActiveChartTab] = useState<'points' | 'status' | 'departments'>('points');
   const [selectedMyIssueId, setSelectedMyIssueId] = useState<string | null>(null);

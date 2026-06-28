@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { MapComponent } from '../components/MapComponent';
 import { Complaint, IssuePriority, AIIntelReport, PriorityDetails } from '../types';
+import { downloadComplaintReport } from '../lib/downloadHelper';
 import { 
   Camera, MapPin, Send, AlertCircle, Building, Check, Bot, Sparkles, 
   Trash2, ShieldAlert, AlertTriangle, HelpCircle, CheckCircle2, Mic, MicOff,
@@ -2091,7 +2092,54 @@ export const ReportIssue: React.FC = () => {
                 id="receipt-download-pdf-btn"
                 type="button"
                 onClick={() => {
-                  showToast('📥 Mock Receipt PDF generated successfully and saved!', 'success');
+                  const currentComplaint: Complaint = registeredComplaint || {
+                    id: receiptNumber || 'TEMP-RECEIPT',
+                    title: title || 'Municipal Complaint',
+                    description: description || '',
+                    city: user?.city || 'Delhi',
+                    address: address || '',
+                    latitude: latitude || 28.6139,
+                    longitude: longitude || 77.2090,
+                    images: attachedImages || [],
+                    videos: attachedVideos || [],
+                    reporterId: user?.uid || 'anonymous',
+                    reporterName: user?.displayName || 'Citizen User',
+                    department: department || 'General Ward Operations',
+                    status: 'SUBMITTED',
+                    priority: priority || 'MEDIUM',
+                    severity: priority || 'MEDIUM',
+                    verificationCount: 1,
+                    upvoters: [user?.uid || 'anonymous'],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    aiIntelReport: aiIntel ? {
+                      detectedIssue: aiIntel.detectedIssue || title,
+                      severity: aiIntel.severity || priority,
+                      publicRisk: aiIntel.publicRisk || 'Standard Public Space',
+                      estimatedRepairCost: aiIntel.estimatedRepairCost || 'SLA Dependent',
+                      estimatedResolutionTime: aiIntel.estimatedResolutionTime || '24 Hours',
+                      confidenceScore: aiIntel.confidenceScore || 98,
+                      responsibleDepartment: aiIntel.responsibleDepartment || department,
+                      environmentalImpact: aiIntel.environmentalImpact || '',
+                      estimatedCitizensAffected: aiIntel.estimatedCitizensAffected || 10,
+                      emergencyRecommendation: aiIntel.emergencyRecommendation || '',
+                      professionalTitle: aiIntel.professionalTitle || 'Visual Classification Verified',
+                      professionalDescription: aiIntel.professionalDescription || aiIntel.explanation || description,
+                      civicAuthenticity: aiIntel.civicAuthenticity || 'REAL',
+                      authenticityAnalysis: aiIntel.authenticityAnalysis || '',
+                      authenticityConfidenceScore: aiIntel.authenticityConfidenceScore || 98
+                    } : undefined,
+                    timeline: [
+                      {
+                        status: 'SUBMITTED',
+                        timestamp: new Date().toISOString(),
+                        note: 'Report successfully logged via CivicPulse Neural Triage system.',
+                        updatedBy: 'CivicPulse Smart-City Gateway'
+                      }
+                    ]
+                  };
+                  downloadComplaintReport(currentComplaint);
+                  showToast('📥 Certified municipal receipt compiled and downloaded!', 'success');
                 }}
                 className="py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-zinc-900 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 rounded-xl border flex items-center justify-center gap-1 transition-colors cursor-pointer"
               >

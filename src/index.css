@@ -165,3 +165,45 @@ html.high-contrast h3,
 html.high-contrast h4 {
   color: #ffffff !important;
 }
+
+@media print {
+  /* Hide non-report layout elements entirely */
+  aside,
+  header,
+  nav,
+  button,
+  .no-print,
+  #notif-bell-desktop,
+  #notifications-dropdown,
+  .fixed,
+  .absolute.right-0,
+  iframe {
+    display: none !important;
+  }
+
+  /* Reset container layout and background */
+  body, 
+  main, 
+  .flex,
+  .min-h-screen,
+  div {
+    background: white !important;
+    color: #0f172a !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  /* Ensure text is dark and fully readable */
+  h1, h2, h3, h4, h5, h6, p, span, div, text {
+    color: #0f172a !important;
+    text-shadow: none !important;
+  }
+
+  /* Force grid layouts to remain functional for cards, etc. */
+  .grid {
+    display: grid !important;
+  }
+}

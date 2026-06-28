@@ -10,6 +10,7 @@ import {
 import { Complaint, IssueStatus, Comment } from '../types';
 import { collection, onSnapshot, query, where, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { downloadComplaintReport } from '../lib/downloadHelper';
 
 export const IssueList: React.FC = () => {
   const { user, complaints, upvoteComplaint, addComment, showToast, t } = useApp();
@@ -501,7 +502,14 @@ export const IssueList: React.FC = () => {
                 <div className="flex items-center gap-2.5">
                   <button
                     id="drawer-download-pdf-btn"
-                    onClick={() => showToast('📥 Mock PDF receipt compiled and downloaded!', 'success')}
+                    onClick={() => {
+                      if (selectedComplaint) {
+                        downloadComplaintReport(selectedComplaint);
+                        showToast('📥 Official complaint statement downloaded!', 'success');
+                      } else {
+                        showToast('No complaint selected.', 'error');
+                      }
+                    }}
                     className="p-2.5 bg-white dark:bg-zinc-900 border rounded-xl text-slate-500 hover:text-indigo-500 hover:border-indigo-500 transition-colors cursor-pointer"
                     title="Download Receipt"
                   >
