@@ -660,8 +660,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         (error) => console.warn('Firestore user rewards offline', error)
       );
 
+      const targetUserIds = [user.uid];
+      if (user.role === 'officer') {
+        targetUserIds.push('officers');
+      }
+
       unsubscribeNotifications = onSnapshot(
-        query(collection(db, 'notifications'), where('userId', '==', user.uid), orderBy('createdAt', 'desc')),
+        query(collection(db, 'notifications'), where('userId', 'in', targetUserIds), orderBy('createdAt', 'desc')),
         (snapshot) => {
           const list: AppNotification[] = [];
           snapshot.forEach((doc) => list.push({ id: doc.id, ...doc.data() } as AppNotification));
@@ -722,7 +727,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     try {
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, updatedData);
+      await setDoc(userRef, updatedData, { merge: true });
       showToast('Profile updated successfully!', 'success');
     } catch (e: any) {
       console.warn('Firestore profile update offline, updated locally:', e);
@@ -853,11 +858,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const updatedBadge = updatedPoints > 500 ? 'Platinum Guardian' : updatedPoints > 300 ? 'Gold Sentinel' : updatedPoints > 150 ? 'Silver Inspector' : 'Bronze Sentinel';
         
         const userRef = doc(db, 'users', user.uid);
-        await updateDoc(userRef, {
+        await setDoc(userRef, {
           points: updatedPoints,
           reportedCount: updatedCount,
           badge: updatedBadge
-        });
+        }, { merge: true });
 
         setUser(prev => prev ? { ...prev, points: updatedPoints, reportedCount: updatedCount, badge: updatedBadge } : null);
         
@@ -867,6 +872,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           title: 'Report Registered successfully +50 pts!',
           description: `Thank you for contributing to a cleaner ${city}! Your issue "${title}" was analyzed and routed to ${department}.`,
           type: 'reward',
+          referenceId: docRef.id,
+          read: false,
+          createdAt: new Date().toISOString()
+        });
+
+        // Broadcast alert notification to municipal officers
+        await addDoc(collection(db, 'notifications'), {
+          userId: 'officers',
+          title: `🚨 New Report: ${title}`,
+          description: `A new ${priority} severity issue regarding "${title}" has been reported in ${city}, routed to ${department}.`,
+          type: 'new_complaint',
           referenceId: docRef.id,
           read: false,
           createdAt: new Date().toISOString()
@@ -931,7 +947,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const currentPoints = user.points || 0;
       const updatedPoints = currentPoints + 15;
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, { points: updatedPoints });
+      await setDoc(userRef, { points: updatedPoints }, { merge: true });
       setUser(prev => prev ? { ...prev, points: updatedPoints } : null);
 
       // Notify the original reporter
@@ -1069,7 +1085,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await addDoc(collection(db, 'user_rewards'), newUserReward);
       
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, { points: updatedPoints });
+      await setDoc(userRef, { points: updatedPoints }, { merge: true });
       setUser(prev => prev ? { ...prev, points: updatedPoints } : null);
 
       await addDoc(collection(db, 'notifications'), {

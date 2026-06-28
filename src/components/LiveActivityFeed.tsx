@@ -15,23 +15,30 @@ const TEMPLATE_POOL = [
   {
     agent: 'Vision Agent',
     icon: <Bot className="w-3.5 h-3.5 text-indigo-400" />,
-    message: 'Analyzed complaint #POT-904 (Asphalt fracture). Confidence score: 98.6%.',
+    message: 'Vision Agent analysed complaint #1042 (Pavement Stress). Match confidence: 97.4%.',
     badgeText: 'Visual Triage',
     badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
   },
   {
     agent: 'Priority Agent',
     icon: <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />,
-    message: 'Escalated sewage leak #WSS-310 to CRITICAL due to proximity of active hospital corridor.',
+    message: 'Priority raised from Medium to High on pothole complaint #1024 (Connaught Place Sector).',
     badgeText: 'Priority Boost',
     badgeColor: 'bg-rose-500/10 text-rose-400 border-rose-500/20'
   },
   {
-    agent: 'Duplicate Agent',
+    agent: 'Duplicate Detection Agent',
     icon: <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />,
-    message: 'Detected 92% visual/spatial match for garbage heap report #GAR-112. Merged with active ledger #GAR-084.',
+    message: 'Duplicate Detection Agent merged complaint #1055 with active issue #1012.',
     badgeText: 'Ledger Cleaned',
     badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+  },
+  {
+    agent: 'Resource Allocation Agent',
+    icon: <Zap className="w-3.5 h-3.5 text-purple-400" />,
+    message: 'Resource Allocation Agent assigned Sector 4 Pavement Crew to issue #1024.',
+    badgeText: 'SLA Optimised',
+    badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
   },
   {
     agent: 'Prediction Agent',

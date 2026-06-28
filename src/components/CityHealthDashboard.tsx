@@ -117,49 +117,121 @@ export const CityHealthDashboard: React.FC = () => {
         {/* Middle Col: Ward Comparison Selector */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Ward comparison telemetry</span>
-            <span className="text-[9px] text-indigo-500 font-extrabold">Click any ward to inspect</span>
+            <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Ward comparison & interactive map</span>
+            <span className="text-[9px] text-indigo-500 font-extrabold">Select a sector on map or list</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            {WARD_POOL.map((ward) => {
-              const isSelected = selectedWard.name === ward.name;
-              return (
-                <button
-                  key={ward.name}
-                  onClick={() => setSelectedWard(ward)}
-                  className={`p-4 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
-                    isSelected 
-                      ? 'border-indigo-500 bg-indigo-50/25 dark:bg-indigo-950/15 ring-2 ring-indigo-500/10 shadow-sm' 
-                      : 'border-slate-100 hover:border-slate-300 dark:border-zinc-800 bg-white dark:bg-zinc-900'
-                  }`}
-                >
-                  <div className="flex justify-between items-start w-full">
-                    <span className="font-extrabold text-slate-800 dark:text-zinc-200 text-xs flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-rose-500" />
-                      {ward.name}
-                    </span>
-                    <span className={`inline-flex items-center gap-0.5 text-[10px] font-black ${
-                      ward.trend === 'up' ? 'text-emerald-500' : ward.trend === 'down' ? 'text-rose-500' : 'text-slate-400'
-                    }`}>
-                      {ward.health}%
-                      {ward.trend === 'up' ? <ArrowUpRight className="w-3 h-3" /> : ward.trend === 'down' ? <ArrowDownRight className="w-3 h-3" /> : <span className="text-xs font-black">─</span>}
-                    </span>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {/* Color-Coded Vector Map Card */}
+            <div className="md:col-span-2 p-4 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200/50 dark:border-zinc-850 flex flex-col justify-between space-y-3">
+              <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Interactive Ward Map</span>
+              <div className="flex items-center justify-center p-1 relative h-36">
+                <svg viewBox="0 0 200 200" className="w-full h-full max-h-[140px]">
+                  {/* Central Hub: Connaught Place */}
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r="25"
+                    onClick={() => setSelectedWard(WARD_POOL[0])}
+                    className={`cursor-pointer transition-all duration-300 stroke-2 ${
+                      selectedWard.name === 'Connaught Place' 
+                        ? 'fill-indigo-500/40 stroke-indigo-500 shadow-md ring-4 ring-indigo-500/20' 
+                        : 'fill-emerald-500/25 stroke-emerald-500 hover:fill-emerald-500/40'
+                    }`}
+                  />
+                  {/* North Sector: Chandni Chowk */}
+                  <path
+                    d="M 60 40 L 140 40 L 120 75 L 80 75 Z"
+                    onClick={() => setSelectedWard(WARD_POOL[2])}
+                    className={`cursor-pointer transition-all duration-300 stroke-2 ${
+                      selectedWard.name === 'Chandni Chowk' 
+                        ? 'fill-indigo-500/40 stroke-indigo-500 shadow-md ring-4 ring-indigo-500/20' 
+                        : 'fill-rose-500/25 stroke-rose-500 hover:fill-rose-500/40'
+                    }`}
+                  />
+                  {/* West Sector: Karol Bagh */}
+                  <path
+                    d="M 20 80 L 70 85 L 60 135 L 10 115 Z"
+                    onClick={() => setSelectedWard(WARD_POOL[1])}
+                    className={`cursor-pointer transition-all duration-300 stroke-2 ${
+                      selectedWard.name === 'Karol Bagh' 
+                        ? 'fill-indigo-500/40 stroke-indigo-500 shadow-md ring-4 ring-indigo-500/20' 
+                        : 'fill-amber-500/25 stroke-amber-500 hover:fill-amber-500/40'
+                    }`}
+                  />
+                  {/* South Sector: Saket */}
+                  <path
+                    d="M 75 125 L 125 125 L 145 175 L 55 175 Z"
+                    onClick={() => setSelectedWard(WARD_POOL[3])}
+                    className={`cursor-pointer transition-all duration-300 stroke-2 ${
+                      selectedWard.name === 'Saket' 
+                        ? 'fill-indigo-500/40 stroke-indigo-500 shadow-md ring-4 ring-indigo-500/20' 
+                        : 'fill-emerald-500/25 stroke-emerald-500 hover:fill-emerald-500/40'
+                    }`}
+                  />
+                  {/* East Sector: Vasant Kunj */}
+                  <path
+                    d="M 125 85 L 175 75 L 185 125 L 135 125 Z"
+                    onClick={() => setSelectedWard(WARD_POOL[4])}
+                    className={`cursor-pointer transition-all duration-300 stroke-2 ${
+                      selectedWard.name === 'Vasant Kunj' 
+                        ? 'fill-indigo-500/40 stroke-indigo-500 shadow-md ring-4 ring-indigo-500/20' 
+                        : 'fill-emerald-500/25 stroke-emerald-500 hover:fill-emerald-500/40'
+                    }`}
+                  />
+                  {/* Labels over shapes */}
+                  <text x="100" y="103" textAnchor="middle" className="text-[8px] font-black fill-slate-800 dark:fill-zinc-300 pointer-events-none">CP</text>
+                  <text x="100" y="55" textAnchor="middle" className="text-[8px] font-black fill-slate-800 dark:fill-zinc-300 pointer-events-none">CC</text>
+                  <text x="40" y="105" textAnchor="middle" className="text-[8px] font-black fill-slate-800 dark:fill-zinc-300 pointer-events-none">KB</text>
+                  <text x="100" y="155" textAnchor="middle" className="text-[8px] font-black fill-slate-800 dark:fill-zinc-300 pointer-events-none">SK</text>
+                  <text x="155" y="105" textAnchor="middle" className="text-[8px] font-black fill-slate-800 dark:fill-zinc-300 pointer-events-none">VK</text>
+                </svg>
+              </div>
+              <span className="text-[8px] text-center text-slate-400 font-extrabold tracking-tight">CC (Critical) • KB (Warn) • CP/SK/VK (Stable)</span>
+            </div>
 
-                  <div className="mt-3.5 w-full space-y-2">
-                    <div className="flex justify-between text-[9px] text-slate-400">
-                      <span>Infra: {ward.infra}%</span>
-                      <span>Engagement: {ward.engagement}%</span>
+            {/* Ward List */}
+            <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[175px] overflow-y-auto pr-1">
+              {WARD_POOL.map((ward) => {
+                const isSelected = selectedWard.name === ward.name;
+                return (
+                  <button
+                    key={ward.name}
+                    type="button"
+                    onClick={() => setSelectedWard(ward)}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
+                      isSelected 
+                        ? 'border-indigo-500 bg-indigo-50/25 dark:bg-indigo-950/15 ring-2 ring-indigo-500/10 shadow-sm' 
+                        : 'border-slate-200/60 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 hover:border-slate-300 dark:hover:border-zinc-700'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start w-full">
+                      <span className="font-extrabold text-slate-800 dark:text-zinc-200 text-[11px] flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                        {ward.name}
+                      </span>
+                      <span className={`inline-flex items-center gap-0.5 text-[10px] font-black ${
+                        ward.trend === 'up' ? 'text-emerald-500' : ward.trend === 'down' ? 'text-rose-500' : 'text-slate-400'
+                      }`}>
+                        {ward.health}%
+                        {ward.trend === 'up' ? <ArrowUpRight className="w-3 h-3" /> : ward.trend === 'down' ? <ArrowDownRight className="w-3 h-3" /> : <span className="text-xs font-black">─</span>}
+                      </span>
                     </div>
-                    {/* Micro gauge */}
-                    <div className="w-full bg-slate-100 dark:bg-zinc-800 h-1 rounded-full overflow-hidden">
-                      <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${ward.health}%` }} />
+
+                    <div className="mt-2 w-full space-y-1.5">
+                      <div className="flex justify-between text-[8px] text-slate-400 font-bold">
+                        <span>Infra: {ward.infra}%</span>
+                        <span>Engage: {ward.engagement}%</span>
+                      </div>
+                      {/* Micro gauge */}
+                      <div className="w-full bg-slate-100 dark:bg-zinc-800/80 h-1 rounded-full overflow-hidden">
+                        <div className="bg-indigo-500 h-full rounded-full" style={{ width: `${ward.health}%` }} />
+                      </div>
                     </div>
-                  </div>
-                </button>
-              );
-            })}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -213,6 +285,45 @@ export const CityHealthDashboard: React.FC = () => {
         </div>
 
       </div>
+
+      {/* NEW: Department Efficiency & Resolution Analytics Panel (Step 5) */}
+      <div className="mt-6 pt-5 border-t border-slate-100 dark:border-zinc-800/60 space-y-4">
+        <div className="flex justify-between items-center">
+          <div className="space-y-0.5 text-left">
+            <span className="text-[9px] font-black uppercase text-indigo-500 block tracking-widest">Departmental Resolution Latency</span>
+            <h4 className="text-sm font-black text-slate-800 dark:text-zinc-100">Municipal Operations Efficiency Matrix</h4>
+          </div>
+          <span className="text-[10px] bg-slate-100 dark:bg-zinc-800 font-mono font-bold text-slate-500 px-2.5 py-0.5 rounded-md">Live SLA Telemetry</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { name: 'Roads & Infrastructure', efficiency: 94, time: '18h avg', status: 'Optimal', color: 'bg-indigo-500' },
+            { name: 'Water Supply & Sewage', efficiency: 88, time: '14h avg', status: 'Excellent', color: 'bg-sky-500' },
+            { name: 'Sanitation & Waste Management', efficiency: 91, time: '32h avg', status: 'Optimal', color: 'bg-emerald-500' },
+            { name: 'Electricity & Street Lighting', efficiency: 96, time: '22h avg', status: 'Critical SLA Priority', color: 'bg-indigo-600' },
+            { name: 'Public Health & Pollution', efficiency: 85, time: '36h avg', status: 'Under Review', color: 'bg-amber-500' },
+            { name: 'Public Safety & Civic Order', efficiency: 97, time: '8h avg', status: 'Highly Efficient', color: 'bg-teal-500' }
+          ].map((dept) => (
+            <div key={dept.name} className="p-3 rounded-xl border border-slate-100 dark:border-zinc-850 bg-slate-50/50 dark:bg-zinc-950/30 flex flex-col justify-between space-y-2.5 text-left">
+              <div className="flex justify-between items-start">
+                <span className="font-extrabold text-[11px] text-slate-700 dark:text-zinc-200">{dept.name}</span>
+                <span className="text-[9px] font-mono font-bold text-indigo-500 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-1.5 py-0.2 rounded">{dept.time}</span>
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-[9px] text-slate-400 font-bold">
+                  <span>Efficiency Index: {dept.efficiency}%</span>
+                  <span className="text-[8px] uppercase tracking-wider">{dept.status}</span>
+                </div>
+                <div className="w-full bg-slate-200/50 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                  <div className={`${dept.color} h-full rounded-full transition-all duration-1000`} style={{ width: `${dept.efficiency}%` }} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 };

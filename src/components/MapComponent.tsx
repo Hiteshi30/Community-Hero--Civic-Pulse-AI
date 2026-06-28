@@ -8,6 +8,9 @@ interface MapComponentProps {
   onSelectComplaint?: (complaint: Complaint) => void;
   onDropPin?: (lat: number, lng: number, address: string) => void;
   interactiveMode?: 'view' | 'report';
+  externalLatitude?: number;
+  externalLongitude?: number;
+  externalAddress?: string;
 }
 
 // City boundaries and centers for Indian cities
@@ -25,7 +28,10 @@ export const MapComponent: React.FC<MapComponentProps> = ({
   selectedCity,
   onSelectComplaint,
   onDropPin,
-  interactiveMode = 'view'
+  interactiveMode = 'view',
+  externalLatitude,
+  externalLongitude,
+  externalAddress
 }) => {
   const currentCityObj = INDIAN_CITIES.find(c => c.name.toLowerCase() === selectedCity.toLowerCase()) || INDIAN_CITIES[0];
   const [zoomLevel, setZoomLevel] = useState(12);
@@ -33,6 +39,17 @@ export const MapComponent: React.FC<MapComponentProps> = ({
   
   // Reported pin coordination states
   const [reportedPin, setReportedPin] = useState<{lat: number, lng: number, address: string} | null>(null);
+
+  // Synchronize pin with external updates (presets, file upload, or camera snapshot)
+  useEffect(() => {
+    if (externalLatitude !== undefined && externalLongitude !== undefined) {
+      setReportedPin({
+        lat: externalLatitude,
+        lng: externalLongitude,
+        address: externalAddress || ''
+      });
+    }
+  }, [externalLatitude, externalLongitude, externalAddress]);
 
   // Filter complaints matching current city
   const filteredComplaints = complaints.filter(

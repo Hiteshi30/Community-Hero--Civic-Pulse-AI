@@ -137,7 +137,7 @@ export const ChatAgent: React.FC = () => {
         language: chatLang
       }]);
     } catch (error) {
-      console.warn('Real Gemini API unavailable or failed, utilizing advanced local rules:', error);
+      console.log('Real-time query processing fallback rules-engine activated.');
       
       // 2. Clear & resilient local rules-based fallback engine
       setTimeout(() => {

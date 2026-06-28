@@ -16,6 +16,9 @@ export const CitizenDashboard: React.FC = () => {
   const { user, complaints, notifications, t } = useApp();
   const navigate = useNavigate();
   const [activeChartTab, setActiveChartTab] = useState<'points' | 'status' | 'departments'>('points');
+  const [selectedMyIssueId, setSelectedMyIssueId] = useState<string | null>(null);
+  const [myIssuesFilter, setMyIssuesFilter] = useState<'ALL' | 'PENDING' | 'RESOLVED'>('ALL');
+  const [userVotedFeedback, setUserVotedFeedback] = useState<Record<string, 'up' | 'down'>>({});
 
   // Animation states for counters
   const [impactScore, setImpactScore] = useState(0);
@@ -28,9 +31,16 @@ export const CitizenDashboard: React.FC = () => {
   
   // Calculate complaints count based on Firestore/mock data
   const myIssues = complaints.filter(c => c.reporterId === user?.uid);
-  const submittedCount = myIssues.length || 3;
-  const resolvedCount = myIssues.filter(c => c.status === 'RESOLVED').length || 1;
-  const pendingCount = submittedCount - resolvedCount || 2;
+
+  useEffect(() => {
+    if (myIssues.length > 0 && !selectedMyIssueId) {
+      setSelectedMyIssueId(myIssues[0].id);
+    }
+  }, [myIssues, selectedMyIssueId]);
+
+  const submittedCount = myIssues.length;
+  const resolvedCount = myIssues.filter(c => c.status === 'RESOLVED').length;
+  const pendingCount = submittedCount - resolvedCount;
 
   // Animate the counters upon landing
   useEffect(() => {
@@ -302,6 +312,308 @@ export const CitizenDashboard: React.FC = () => {
             <Clock className="w-5 h-5" />
           </div>
         </div>
+      </div>
+
+      {/* Flagship Reported Issues & Resolution Status Triage Hub */}
+      <div className="p-6 md:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-slate-100 dark:border-zinc-800 shadow-xs text-left space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-zinc-800/80 pb-5">
+          <div className="space-y-1">
+            <h3 className="text-lg md:text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-indigo-500 animate-pulse" />
+              <span>My Reported Issues & Resolution Reports</span>
+            </h3>
+            <p className="text-xs text-slate-400 font-bold">
+              Monitor live status progression, timeline events, and official municipal closeout certifications.
+            </p>
+          </div>
+
+          <div className="flex bg-slate-50 dark:bg-zinc-950 p-1 rounded-xl self-start md:self-auto border">
+            {(['ALL', 'PENDING', 'RESOLVED'] as const).map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setMyIssuesFilter(filter)}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+                  myIssuesFilter === filter 
+                    ? 'bg-indigo-600 text-white shadow-xs' 
+                    : 'text-slate-500 hover:text-slate-800 dark:hover:text-zinc-200'
+                }`}
+              >
+                {filter === 'ALL' ? 'All History' : filter === 'PENDING' ? 'Pending Repair' : 'Resolved Case'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {myIssues.length === 0 ? (
+          <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 flex items-center justify-center border border-indigo-100/30">
+              <Bot className="w-8 h-8 animate-bounce" />
+            </div>
+            <div className="space-y-1.5 max-w-sm">
+              <h4 className="text-sm font-black text-slate-700 dark:text-zinc-200">No active complaints filed</h4>
+              <p className="text-xs text-slate-400 leading-relaxed font-bold">
+                Your historical record is pristine. You can leverage our AI Vision model to diagnose and triage physical municipal hazards in your community instantly.
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/report')}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black rounded-lg transition-all flex items-center gap-2"
+            >
+              <PlusCircle className="w-4 h-4" />
+              <span>Triage New Issue</span>
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* List Side */}
+            <div className="lg:col-span-5 space-y-3 max-h-[480px] overflow-y-auto pr-2">
+              <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">
+                Your Reports ({myIssues.filter(i => {
+                  if (myIssuesFilter === 'PENDING') return i.status !== 'RESOLVED';
+                  if (myIssuesFilter === 'RESOLVED') return i.status === 'RESOLVED';
+                  return true;
+                }).length})
+              </p>
+              {myIssues.filter(issue => {
+                if (myIssuesFilter === 'PENDING') return issue.status !== 'RESOLVED';
+                if (myIssuesFilter === 'RESOLVED') return issue.status === 'RESOLVED';
+                return true;
+              }).map((issue) => {
+                const isActive = issue.id === selectedMyIssueId;
+                const isResolved = issue.status === 'RESOLVED';
+                
+                return (
+                  <div
+                    key={issue.id}
+                    onClick={() => setSelectedMyIssueId(issue.id)}
+                    className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all flex gap-3 ${
+                      isActive 
+                        ? 'bg-indigo-50/40 dark:bg-indigo-950/15 border-indigo-500 shadow-xs' 
+                        : 'bg-white dark:bg-zinc-900/60 border-slate-100 dark:border-zinc-800/80 hover:border-slate-300 dark:hover:border-zinc-700'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-lg bg-slate-50 dark:bg-zinc-950 overflow-hidden shrink-0 border relative">
+                      <img 
+                        src={issue.images?.[0] || 'https://images.unsplash.com/photo-1541417904950-b855846fe074?auto=format&fit=crop&w=100&q=80'} 
+                        alt="Evidence thumbnail"
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+
+                    <div className="space-y-1 grow min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[9px] font-black uppercase bg-slate-100 dark:bg-zinc-800/60 text-slate-500 px-1.5 py-0.5 rounded-md truncate">
+                          {issue.department.split(' ')[0]}
+                        </span>
+                        <span className={`text-[8px] font-black px-2 py-0.5 rounded-full ${
+                          isResolved 
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                            : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                        }`}>
+                          {issue.status}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-black text-slate-800 dark:text-zinc-100 truncate pr-2">
+                        {issue.title}
+                      </h4>
+                      <p className="text-[10px] text-slate-400 font-medium truncate flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-rose-400" />
+                        <span>{issue.address.split(',')[0]}</span>
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Detailed Tracking Panel */}
+            <div className="lg:col-span-7 bg-slate-50/50 dark:bg-zinc-950/20 rounded-2xl border border-slate-100 dark:border-zinc-800 p-5 space-y-6">
+              {(() => {
+                const selectedIssue = myIssues.find(i => i.id === selectedMyIssueId);
+                if (!selectedIssue) {
+                  return (
+                    <div className="h-full flex flex-col items-center justify-center text-center py-16 text-slate-400 space-y-2">
+                      <Bot className="w-8 h-8 text-slate-300" />
+                      <p className="text-xs font-bold">Select any report from history list to inspect live resolution details.</p>
+                    </div>
+                  );
+                }
+
+                const isResolved = selectedIssue.status === 'RESOLVED';
+                const currentStatus = selectedIssue.status;
+                const timeline = selectedIssue.timeline || [];
+
+                // Standardized stages
+                const stages: { key: IssueStatus; label: string; desc: string }[] = [
+                  { key: 'SUBMITTED', label: '1. Logged', desc: 'Report submitted & point credentials allocated' },
+                  { key: 'VERIFIED', label: '2. Audited', desc: 'AI Vision checked & localized on municipal grid' },
+                  { key: 'ASSIGNED', label: '3. Dispatched', desc: 'Task assigned to specialized Ward Unit' },
+                  { key: 'IN_PROGRESS', label: '4. Active Repair', desc: 'Civil engineering crew on location' },
+                  { key: 'RESOLVED', label: '5. Resolved', desc: 'Closure statement issued by municipality' },
+                ];
+
+                const getStageIndex = (status: IssueStatus) => {
+                  const idx = stages.findIndex(s => s.key === status);
+                  return idx !== -1 ? idx : 0;
+                };
+
+                const currentStageIdx = getStageIndex(currentStatus);
+
+                return (
+                  <div className="space-y-5">
+                    {/* Header Info */}
+                    <div className="space-y-1.5 border-b border-slate-100 dark:border-zinc-800/80 pb-4">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase text-white ${
+                          selectedIssue.priority === 'CRITICAL' ? 'bg-rose-600' : selectedIssue.priority === 'HIGH' ? 'bg-amber-500' : 'bg-slate-500'
+                        }`}>
+                          {selectedIssue.priority} Severity
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-bold">
+                          Filed on {new Date(selectedIssue.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-black text-slate-800 dark:text-zinc-100">
+                        {selectedIssue.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-zinc-300 leading-relaxed font-semibold">
+                        {selectedIssue.description}
+                      </p>
+                    </div>
+
+                    {/* Stepper Grid */}
+                    <div className="space-y-4">
+                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
+                        Live Status Stepper
+                      </p>
+                      <div className="grid grid-cols-5 gap-1.5 relative">
+                        {stages.map((stage, idx) => {
+                          const isCompleted = idx <= currentStageIdx;
+                          const isActive = idx === currentStageIdx;
+                          
+                          return (
+                            <div key={stage.key} className="flex flex-col items-center text-center space-y-1">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black transition-all ${
+                                isCompleted 
+                                  ? 'bg-indigo-600 text-white shadow-xs' 
+                                  : 'bg-slate-100 dark:bg-zinc-800/80 text-slate-400'
+                              } ${isActive ? 'ring-2 ring-offset-2 ring-indigo-500 dark:ring-offset-zinc-900' : ''}`}>
+                                {isCompleted ? '✓' : idx + 1}
+                              </div>
+                              <span className={`text-[9px] font-black tracking-tight ${
+                                isActive ? 'text-indigo-600 dark:text-indigo-400' : isCompleted ? 'text-slate-700 dark:text-zinc-300' : 'text-slate-400'
+                              }`}>
+                                {stage.key.replace('_', ' ')}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Case Timeline logs */}
+                    <div className="bg-white dark:bg-zinc-900 border rounded-xl p-3 text-xs space-y-2.5">
+                      <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest block">
+                        Official Timeline Logs
+                      </span>
+                      <div className="space-y-2">
+                        {timeline.map((event, i) => (
+                          <div key={i} className="flex gap-2 text-[10px] items-start border-l border-indigo-100 dark:border-zinc-800 pl-2.5 ml-1.5 relative">
+                            <span className="absolute w-1.5 h-1.5 rounded-full bg-indigo-500 -left-[4px] top-1" />
+                            <div className="space-y-0.5 grow">
+                              <div className="flex justify-between font-bold">
+                                <span className="text-slate-700 dark:text-zinc-200 uppercase tracking-wide">
+                                  {event.status}
+                                </span>
+                                <span className="text-slate-400 font-medium">
+                                  {new Date(event.timestamp).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                              </div>
+                              <p className="text-slate-500 dark:text-zinc-400">{event.note}</p>
+                              <span className="text-[9px] text-indigo-400/80 font-bold">Updated by: {event.updatedBy || 'System'}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Official Resolution Certified Report (Shown if RESOLVED) */}
+                    {isResolved && (
+                      <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-500/10 dark:from-emerald-950/20 dark:to-emerald-500/5 border border-emerald-200 dark:border-emerald-800/40 space-y-3">
+                        <div className="flex items-center justify-between border-b border-emerald-200/50 dark:border-emerald-800/20 pb-2">
+                          <span className="text-[9px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <span>Official Resolution Certified Report</span>
+                          </span>
+                          <span className="text-[8px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-black tracking-widest uppercase">
+                            Case Closed
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 text-[10px] text-slate-500 dark:text-zinc-400 font-semibold">
+                          <div>
+                            <span className="text-slate-400 font-bold block text-[8px] uppercase tracking-wider">Certified Authority</span>
+                            <span className="text-slate-800 dark:text-zinc-200 font-black">
+                              {selectedIssue.assignedOfficerName || 'Senior Ward Inspector'}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-slate-400 font-bold block text-[8px] uppercase tracking-wider">Department In-Charge</span>
+                            <span className="text-slate-800 dark:text-zinc-200 font-black">
+                              {selectedIssue.department}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-2.5 bg-white/70 dark:bg-zinc-900/60 rounded-lg border border-emerald-100 dark:border-emerald-950 text-[11px] leading-relaxed text-slate-600 dark:text-zinc-300">
+                          <span className="text-slate-400 font-extrabold block text-[8px] uppercase tracking-wider mb-0.5">Resolution Summary Statement</span>
+                          {timeline.find(t => t.status === 'RESOLVED')?.note || 
+                            'The reported infrastructure hazard has been fully cleared, tested, and certified safe for general public traversal. Standard aggregate or component leveling applied successfully.'}
+                        </div>
+
+                        {/* Interactive Feedback Rating */}
+                        <div className="flex items-center justify-between pt-1.5 gap-4">
+                          <span className="text-[10px] font-extrabold text-slate-700 dark:text-zinc-300">Are you satisfied with the resolution?</span>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setUserVotedFeedback(prev => ({ ...prev, [selectedIssue.id]: 'up' }));
+                                showToast('Thank you for verifying the municipal resolution!', 'success');
+                              }}
+                              className={`p-1.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 text-[9px] font-black ${
+                                userVotedFeedback[selectedIssue.id] === 'up'
+                                  ? 'bg-emerald-600 text-white border-emerald-600'
+                                  : 'bg-white dark:bg-zinc-900 hover:bg-emerald-50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300'
+                              }`}
+                            >
+                              <ThumbsUp className="w-3.5 h-3.5" />
+                              <span>Yes</span>
+                            </button>
+                            <button
+                              onClick={() => {
+                                setUserVotedFeedback(prev => ({ ...prev, [selectedIssue.id]: 'down' }));
+                                showToast('We have logged your dissatisfaction. Standard inspection flag raised.', 'info');
+                              }}
+                              className={`p-1.5 rounded-lg border transition-all flex items-center justify-center gap-1.5 text-[9px] font-black ${
+                                userVotedFeedback[selectedIssue.id] === 'down'
+                                  ? 'bg-rose-600 text-white border-rose-600'
+                                  : 'bg-white dark:bg-zinc-900 hover:bg-rose-50 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-zinc-300'
+                              }`}
+                            >
+                              <ThumbsUp className="w-3.5 h-3.5 rotate-180" />
+                              <span>No</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Flagship Upgraded City Health Dashboard */}

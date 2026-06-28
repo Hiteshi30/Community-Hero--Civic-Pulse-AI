@@ -84,6 +84,12 @@ export interface AIIntelReport {
   emergencyRecommendation: string;
   professionalTitle: string;
   professionalDescription: string;
+  civicAuthenticity?: 'REAL' | 'FAKE' | 'INVALID';
+  authenticityAnalysis?: string;
+  authenticityConfidenceScore?: number;
+  detectedLatitude?: number;
+  detectedLongitude?: number;
+  detectedAddress?: string;
 }
 
 export interface PriorityDetails {
